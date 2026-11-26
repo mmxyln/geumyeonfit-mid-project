@@ -1,30 +1,84 @@
-// TODO: 앱 이름 v2 — GAI3008 중간고사 (UI만 구현)
-//
-// ┌──────── 디자인 가이드 대응표: 앱 뼈대 ──────────────────────────────────────┐
-// │ 번호 │ Flutter 위젯명        │ 비즈니스 명칭(한글)      │ 원칙(P번호)       │
-// │ S-1  │ MaterialApp           │ TODO: 앱 이름            │ —                 │
-// │ S-2  │ ThemeData(seedColor)  │ TODO: 브랜드 색          │ P04 일관성 (예)   │
-// └────────────────────────────────────────────────────────────────────────────┘
-// 화면 흐름(docs/디자인가이드.md 1장과 같게):
-//   A 목록 ──쌓기(push)──▶ B 상세 [옆으로(tab): 정보 | 메모] ──덮기(modal)──▶ C 결과(임의)
-// 기획 문서에 없는 화면은 만들지 않는다(감점). 화면을 늘리면 이 주석·가이드도 같이 고친다.
 import 'package:flutter/material.dart';
 
-import 'screens/a_list_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/plan_screen.dart';
+import 'screens/trends_screen.dart';
 
-void main() => runApp(const MidProjectApp());
+void main() {
+  runApp(const GeumyeonFitApp());
+}
 
-class MidProjectApp extends StatelessWidget {
-  const MidProjectApp({super.key});
+class GeumyeonFitApp extends StatelessWidget {
+  const GeumyeonFitApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: const Color(0xFF2E7D5B),
+      brightness: Brightness.light,
+    );
+
     return MaterialApp(
-      title: 'Mid Project Template', // S-1 TODO: 내 앱 이름 v2로 바꾼다
       debugShowCheckedModeBanner: false,
-      // S-2 TODO: 현행 앱의 브랜드 색으로 바꾼다
-      theme: ThemeData(colorSchemeSeed: const Color(0xFF3F51B5)),
-      home: const ListScreen(),
+      title: '금연핏',
+      theme: ThemeData(
+        colorScheme: colorScheme,
+        useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFFF6F7F8),
+        cardTheme: const CardThemeData(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+        ),
+      ),
+      home: const AppShell(),
+    );
+  }
+}
+
+class AppShell extends StatefulWidget {
+  const AppShell({super.key});
+
+  @override
+  State<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<AppShell> {
+  // STATE: S0 현재 선택된 탭. 로컬 표시 변경만 하며 영구 저장하지 않음.
+  int _index = 0;
+
+  static const _screens = [
+    HomeScreen(),
+    TrendsScreen(),
+    PlanScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(index: _index, children: _screens),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _index,
+        onDestinationSelected: (value) {
+          setState(() => _index = value);
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: '오늘',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.insights_outlined),
+            selectedIcon: Icon(Icons.insights),
+            label: '추세',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.flag_outlined),
+            selectedIcon: Icon(Icons.flag),
+            label: '감량 계획',
+          ),
+        ],
+      ),
     );
   }
 }
